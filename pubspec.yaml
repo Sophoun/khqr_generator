@@ -1,6 +1,6 @@
 name: khqr_generator
 description: "KHQR Generator (It's not an official library from NBC)"
-version: 0.0.1
+version: 0.0.2
 homepage: https://sophoun.com
 
 environment:
