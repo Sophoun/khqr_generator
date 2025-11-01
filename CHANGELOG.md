@@ -1,3 +1,9 @@
+## 0.0.5
+
+* Update code comments.
+
+---
+
 ## 0.0.4
 
 * Update readme.md.
