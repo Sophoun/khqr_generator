@@ -1,3 +1,9 @@
+## 0.0.2
+
+* Add license below README.md.
+
+---
+
 ## 0.0.1
 
 * Initial release of the `khqr_generator` library.
