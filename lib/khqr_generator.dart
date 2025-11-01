@@ -2,7 +2,8 @@
 // Based on khqr-1.0.20.min.js
 
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
+
+import 'src/md5.dart';
 
 // ============================================================================
 // Constants and Error Codes
@@ -12,11 +13,13 @@ import 'package:crypto/crypto.dart';
 enum KHQRCurrency {
   /// Cambodian Riel (KHR) currency with code 116.
   khr(116, 'khr'),
+
   /// United States Dollar (USD) currency with code 840.
   usd(840, 'usd');
 
   /// The numeric code of the currency.
   final int code;
+
   /// The name of the currency.
   final String name;
 
@@ -28,84 +31,121 @@ enum KHQRCurrency {
 enum MerchantType {
   /// Indicates an individual merchant.
   individual,
+
   /// Indicates a business merchant.
-  merchant
+  merchant,
 }
 
 /// EMV (Europay, MasterCard, and Visa) constants used in KHQR generation.
 class EMV {
   /// Tag for Payload Format Indicator.
   static const PAYLOAD_FORMAT_INDICATOR = '00';
+
   /// Default value for Payload Format Indicator.
   static const DEFAULT_PAYLOAD_FORMAT_INDICATOR = '01';
+
   /// Tag for Point of Initiation Method.
   static const POINT_OF_INITIATION_METHOD = '01';
+
   /// Value for Static QR in Point of Initiation Method.
   static const STATIC_QR = '11';
+
   /// Value for Dynamic QR in Point of Initiation Method.
   static const DYNAMIC_QR = '12';
+
   /// Tag for Merchant Account Information (Individual).
   static const MERCHANT_ACCOUNT_INFORMATION_INDIVIDUAL = '29';
+
   /// Tag for Merchant Account Information (Merchant).
   static const MERCHANT_ACCOUNT_INFORMATION_MERCHANT = '30';
+
   /// Sub-tag for Bakong Account Identifier within Merchant Account Information.
   static const BAKONG_ACCOUNT_IDENTIFIER = '00';
+
   /// Sub-tag for Merchant ID within Merchant Account Information.
   static const MERCHANT_ACCOUNT_INFORMATION_MERCHANT_ID = '01';
+
   /// Sub-tag for Individual Account Information within Merchant Account Information.
   static const INDIVIDUAL_ACCOUNT_INFORMATION = '01';
+
   /// Sub-tag for Acquiring Bank within Merchant Account Information.
   static const MERCHANT_ACCOUNT_INFORMATION_ACQUIRING_BANK = '02';
+
   /// Tag for Merchant Category Code.
   static const MERCHANT_CATEGORY_CODE = '52';
+
   /// Default value for Merchant Category Code.
   static const DEFAULT_MERCHANT_CATEGORY_CODE = '5999';
+
   /// Tag for Transaction Currency.
   static const TRANSACTION_CURRENCY = '53';
+
   /// Tag for Transaction Amount.
   static const TRANSACTION_AMOUNT = '54';
+
   /// Default value for Transaction Amount.
   static const DEFAULT_TRANSACTION_AMOUNT = '0';
+
   /// Tag for Country Code.
   static const COUNTRY_CODE = '58';
+
   /// Default value for Country Code (Cambodia).
   static const DEFAULT_COUNTRY_CODE = 'KH';
+
   /// Tag for Merchant Name.
   static const MERCHANT_NAME = '59';
+
   /// Tag for Merchant City.
   static const MERCHANT_CITY = '60';
+
   /// Default value for Merchant City (Phnom Penh).
   static const DEFAULT_MERCHANT_CITY = 'Phnom Penh';
+
   /// Tag for CRC (Cyclic Redundancy Check).
   static const CRC = '63';
+
   /// Length of the CRC field.
   static const CRC_LENGTH = '04';
+
   /// Tag for Additional Data Field.
   static const ADDITIONAL_DATA_TAG = '62';
+
   /// Sub-tag for Bill Number within Additional Data Field.
   static const BILLNUMBER_TAG = '01';
+
   /// Sub-tag for Mobile Number within Additional Data Field.
   static const ADDITIONAL_DATA_FIELD_MOBILE_NUMBER = '02';
+
   /// Sub-tag for Store Label within Additional Data Field.
   static const STORELABEL_TAG = '03';
+
   /// Sub-tag for Terminal Label within Additional Data Field.
   static const TERMINAL_TAG = '07';
+
   /// Sub-tag for Purpose of Transaction within Additional Data Field.
   static const PURPOSE_OF_TRANSACTION = '08';
+
   /// Tag for Timestamp.
   static const TIMESTAMP_TAG = '99';
+
   /// Sub-tag for Creation Timestamp within Timestamp.
   static const CREATION_TIMESTAMP = '00';
+
   /// Sub-tag for Expiration Timestamp within Timestamp.
   static const EXPIRATION_TIMESTAMP = '01';
+
   /// Tag for Merchant Information Language Template.
   static const MERCHANT_INFORMATION_LANGUAGE_TEMPLATE = '64';
+
   /// Sub-tag for Language Preference within Merchant Information Language Template.
   static const LANGUAGE_PREFERENCE = '00';
+
   /// Sub-tag for Merchant Name Alternate Language within Merchant Information Language Template.
   static const MERCHANT_NAME_ALTERNATE_LANGUAGE = '01';
+
   /// Sub-tag for Merchant City Alternate Language within Merchant Information Language Template.
   static const MERCHANT_CITY_ALTERNATE_LANGUAGE = '02';
+
   /// Tag for UnionPay Merchant Account.
   static const UNIONPAY_MERCHANT_ACCOUNT = '15';
 
@@ -144,121 +184,145 @@ class ErrorCode {
     'code': 1,
     'message': 'Bakong Account ID cannot be null or empty',
   };
+
   /// Error for when Merchant Name is required but not provided.
   static const MERCHANT_NAME_REQUIRED = {
     'code': 2,
     'message': 'Merchant name cannot be null or empty',
   };
+
   /// Error for when Bakong Account ID is invalid.
   static const BAKONG_ACCOUNT_ID_INVALID = {
     'code': 3,
     'message': 'Bakong Account ID is invalid',
   };
+
   /// Error for when Transaction Amount is invalid.
   static const TRANSACTION_AMOUNT_INVALID = {
     'code': 4,
     'message': 'Amount is invalid',
   };
+
   /// Error for when Merchant Type is required but not provided.
   static const MERCHANT_TYPE_REQUIRED = {
     'code': 5,
     'message': 'Merchant type cannot be null or empty',
   };
+
   /// Error for when Bakong Account ID length is invalid.
   static const BAKONG_ACCOUNT_ID_LENGTH_INVALID = {
     'code': 6,
     'message': 'Bakong Account ID Length is Invalid',
   };
+
   /// Error for when Merchant Name length is invalid.
   static const MERCHANT_NAME_LENGTH_INVALID = {
     'code': 7,
     'message': 'Merchant Name Length is invalid',
   };
+
   /// Error for when the provided KHQR string is invalid.
   static const KHQR_INVALID = {
     'code': 8,
     'message': 'KHQR provided is invalid',
   };
+
   /// Error for when Currency Type is required but not provided.
   static const CURRENCY_TYPE_REQUIRED = {
     'code': 9,
     'message': 'Currency type cannot be null or empty',
   };
+
   /// Error for when Merchant City is required but not provided.
   static const MERCHANT_CITY_TAG_REQUIRED = {
     'code': 27,
     'message': 'Merchant City cannot be null or empty',
   };
+
   /// Error for when Merchant City length is invalid.
   static const MERCHANT_CITY_LENGTH_INVALID = {
     'code': 20,
     'message': 'Merchant city Length is invalid',
   };
+
   /// Error for when Merchant Category Tag is required but not provided.
   static const MERCHANT_CATEGORY_TAG_REQUIRED = {
     'code': 25,
     'message': 'Merchant category tag required',
   };
+
   /// Error for when Merchant Code length is invalid.
   static const MERCHANT_CODE_LENGTH_INVALID = {
     'code': 18,
     'message': 'Merchant code Length is invalid',
   };
+
   /// Error for when an invalid Merchant Category Code is provided.
   static const INVALID_MERCHANT_CATEGORY_CODE = {
     'code': 51,
     'message': 'Invalid merchant category code',
   };
+
   /// Error for when Merchant ID is required but not provided.
   static const MERCHANT_ID_REQUIRED = {
     'code': 30,
     'message': 'Merchant ID cannot be null or empty',
   };
+
   /// Error for when Acquiring Bank is required but not provided.
   static const ACQUIRING_BANK_REQUIRED = {
     'code': 31,
     'message': 'Acquiring Bank cannot be null or empty',
   };
+
   /// Error for when Merchant ID length is invalid.
   static const MERCHANT_ID_LENGTH_INVALID = {
     'code': 32,
     'message': 'Merchant ID Length is invalid',
   };
+
   /// Error for when Acquiring Bank length is invalid.
   static const ACQUIRING_BANK_LENGTH_INVALID = {
     'code': 33,
     'message': 'Acquiring Bank Length is invalid',
   };
+
   /// Error for when Account Information length is invalid.
   static const ACCOUNT_INFORMATION_LENGTH_INVALID = {
     'code': 35,
     'message': 'Account Information Length is invalid',
   };
+
   /// Error for when Expiration Timestamp is required for dynamic KHQR but not provided.
   static const EXPIRATION_TIMESTAMP_REQUIRED = {
     'code': 45,
     'message': 'Expiration timestamp is required for dynamic KHQR',
   };
+
   /// Error for when Expiration Timestamp length is invalid.
   static const EXPIRATION_TIMESTAMP_LENGTH_INVALID = {
     'code': 49,
     'message': 'Expiration timestamp length is invalid',
   };
+
   /// Error for when a dynamic KHQR has an invalid transaction amount field.
   static const INVALID_DYNAMIC_KHQR = {
     'code': 47,
     'message': 'This dynamic KHQR has invalid field transaction amount',
   };
+
   /// Error for when Expiration Timestamp is in the past.
   static const EXPIRATION_TIMESTAMP_IN_THE_PAST = {
     'code': 50,
     'message': 'Expiration timestamp is in the past',
   };
+
   /// Error for when a dynamic KHQR has expired.
   static const KHQR_EXPIRED = {
     'code': 46,
     'message': 'This dynamic KHQR has expired',
   };
+
   /// Error for when an unsupported currency is used.
   static const UNSUPPORTED_CURRENCY = {
     'code': 28,
@@ -274,8 +338,10 @@ class ErrorCode {
 class Status {
   /// The status code. 0 for success, 1 for error.
   final int code;
+
   /// The error code, if an error occurred.
   final String? errorCode;
+
   /// A human-readable message describing the status or error.
   final String? message;
 
@@ -292,6 +358,7 @@ class Status {
 class KHQRResponse {
   /// The status of the operation.
   final Status status;
+
   /// The generated or decoded KHQR data, if the operation was successful.
   final KHQRData? data;
 
@@ -316,8 +383,10 @@ class KHQRResponse {
 class KHQRData {
   /// The raw QR string.
   final String qr;
+
   /// The MD5 hash of the QR string.
   final String md5;
+
   /// The decoded data from the QR string, if available.
   final Map<String, dynamic>? decodedData;
 
@@ -347,8 +416,10 @@ class VerificationResult {
 class Tag {
   /// The tag identifier.
   final String tag;
+
   /// The value associated with the tag.
   final String value;
+
   /// The length of the value, formatted as a two-digit string.
   late final String length;
 
@@ -370,38 +441,55 @@ class Tag {
 class IndividualInfo {
   /// The Bakong account ID.
   final String bakongAccountID;
+
   /// Additional account information.
   final String? accountInformation;
+
   /// The acquiring bank.
   final String? acquiringBank;
+
   /// The currency of the transaction.
   final int? currency;
+
   /// The transaction amount.
   final dynamic amount;
+
   /// The name of the merchant.
   final String merchantName;
+
   /// The city of the merchant.
   final String merchantCity;
+
   /// The bill number.
   final String? billNumber;
+
   /// The store label.
   final String? storeLabel;
+
   /// The terminal label.
   final String? terminalLabel;
+
   /// The mobile number.
   final String? mobileNumber;
+
   /// The purpose of the transaction.
   final String? purposeOfTransaction;
+
   /// The language preference.
   final String? languagePreference;
+
   /// The merchant name in an alternate language.
   final String? merchantNameAlternateLanguage;
+
   /// The merchant city in an alternate language.
   final String? merchantCityAlternateLanguage;
+
   /// The UnionPay merchant account.
   final String? upiMerchantAccount;
+
   /// The expiration timestamp for dynamic QR codes.
   final int? expirationTimestamp;
+
   /// The merchant category code.
   final String? merchantCategoryCode;
 
@@ -432,6 +520,7 @@ class IndividualInfo {
 class MerchantInfo extends IndividualInfo {
   /// The merchant ID.
   final String merchantID;
+
   /// The acquiring bank.
   final String acquiringBank;
 
@@ -503,7 +592,12 @@ String calculateCRC(String data) {
 
 /// Calculates the MD5 hash of the given [data].
 String calculateMD5(String data) {
-  return md5.convert(utf8.encode(data)).toString().toUpperCase();
+  final bytes = utf8.encode(data);
+  final hash = md5(bytes);
+  return hash
+      .map((b) => b.toRadixString(16).padLeft(2, '0'))
+      .join()
+      .toUpperCase();
 }
 
 // ============================================================================

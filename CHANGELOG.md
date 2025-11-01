@@ -1,3 +1,9 @@
+## 0.0.6
+
+* Remove unnecessary dependencies.
+
+---
+
 ## 0.0.5
 
 * Update code comments.

@@ -1,20 +1,19 @@
 name: khqr_generator
 description: "KHQR Generator (This is not an official library affiliated with NBC.)"
-version: 0.0.5
+version: 0.0.6
 homepage: https://github.com/Sophoun/khqr_generator
 
 environment:
   sdk: ^3.9.2
-  flutter: ">=1.17.0"
+  # flutter: ">=1.17.0"
 
-dependencies:
-  flutter:
-    sdk: flutter
-  crypto: ^3.0.6
+# dependencies:
+# flutter:
+#   sdk: flutter
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  # flutter_test:
+  #   sdk: flutter
   test: ^1.24.0
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
