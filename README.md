@@ -35,7 +35,7 @@ import 'package:khqr_generator/khqr_generator.dart';
 
 ### Generating an Individual QR Code
 
-To generate a QR code for an individual, use the `BakongKHQR.generateIndividual` method. You need to provide an `IndividualInfo` object with the required information.
+To generate a QR code for an individual, use the `KHQRGenerator.generateIndividual` method. You need to provide an `IndividualInfo` object with the required information.
 
 **Example: Static QR Code**
 
@@ -46,7 +46,7 @@ final individualInfo = IndividualInfo(
   merchantCity: 'Phnom Penh',
 );
 
-final response = BakongKHQR.generateIndividual(individualInfo);
+final response = KHQRGenerator.generateIndividual(individualInfo);
 
 if (response.status.code == 0) {
   print('QR Code: ${response.data!.qr}');
@@ -68,7 +68,7 @@ final individualInfo = IndividualInfo(
   expirationTimestamp: DateTime.now().millisecondsSinceEpoch + 3600000, // 1 hour from now
 );
 
-final response = BakongKHQR.generateIndividual(individualInfo);
+final response = KHQRGenerator.generateIndividual(individualInfo);
 
 if (response.status.code == 0) {
   print('QR Code: ${response.data!.qr}');
@@ -79,7 +79,7 @@ if (response.status.code == 0) {
 
 ### Generating a Merchant QR Code
 
-To generate a QR code for a merchant, use the `BakongKHQR.generateMerchant` method with a `MerchantInfo` object.
+To generate a QR code for a merchant, use the `KHQRGenerator.generateMerchant` method with a `MerchantInfo` object.
 
 ```dart
 final merchantInfo = MerchantInfo(
@@ -90,7 +90,7 @@ final merchantInfo = MerchantInfo(
   acquiringBank: 'Test Bank',
 );
 
-final response = BakongKHQR.generateMerchant(merchantInfo);
+final response = KHQRGenerator.generateMerchant(merchantInfo);
 
 if (response.status.code == 0) {
   print('QR Code: ${response.data!.qr}');
@@ -101,11 +101,11 @@ if (response.status.code == 0) {
 
 ### Verifying a KHQR Code
 
-You can verify the integrity of a KHQR code using the `BakongKHQR.verify` method. This checks the CRC and format of the QR string.
+You can verify the integrity of a KHQR code using the `KHQRGenerator.verify` method. This checks the CRC and format of the QR string.
 
 ```dart
 String qrCode = '...'; // The KHQR string
-final result = BakongKHQR.verify(qrCode);
+final result = KHQRGenerator.verify(qrCode);
 
 if (result.isValid) {
   print('QR Code is valid.');
@@ -116,11 +116,11 @@ if (result.isValid) {
 
 ### Decoding a KHQR Code
 
-To decode a KHQR code and extract the embedded information, use the `BakongKHQR.decode` method.
+To decode a KHQR code and extract the embedded information, use the `KHQRGenerator.decode` method.
 
 ```dart
 String qrCode = '...'; // The KHQR string
-final response = BakongKHQR.decode(qrCode);
+final response = KHQRGenerator.decode(qrCode);
 
 if (response.status.code == 0) {
   final decodedData = response.data!.decodedData;
@@ -132,7 +132,7 @@ if (response.status.code == 0) {
 
 ## API Reference
 
-### `BakongKHQR`
+### `KHQRGenerator`
 
 This class contains the main methods for generating, verifying, and decoding KHQR codes.
 
@@ -182,7 +182,7 @@ The library returns a `KHQRResponse` object which contains a `status` field. If 
 You can find the list of error codes in the `ErrorCode` class.
 
 ```dart
-final response = BakongKHQR.generateIndividual(...);
+final response = KHQRGenerator.generateIndividual(...);
 
 if (response.status.code != 0) {
   print('Error Code: ${response.status.errorCode}');
