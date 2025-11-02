@@ -1,3 +1,9 @@
+## 0.0.7
+
+* Resolve analysis issue.
+
+---
+
 ## 0.0.6
 
 * Remove unnecessary dependencies.

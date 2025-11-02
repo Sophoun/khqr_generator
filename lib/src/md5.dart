@@ -178,7 +178,8 @@ Uint8List md5(List<int> data) {
   // should be 448 mod 512.
   final msgLen = data.length;
   final paddingLen = (56 - (msgLen + 1) % 64) % 64;
-  final totalLen = msgLen + 1 + paddingLen + 8; // +8 for the 64-bit length field
+  final totalLen =
+      msgLen + 1 + paddingLen + 8; // +8 for the 64-bit length field
 
   // Create a new Uint8List to hold the padded message.
   final padded = Uint8List(totalLen);
@@ -215,7 +216,9 @@ Uint8List md5(List<int> data) {
 
     // Main MD5 loop: 64 operations, divided into 4 rounds of 16 operations each.
     for (int i = 0; i < 64; i++) {
-      int f, g; // f is the non-linear function, g is the index for the message word.
+      int
+      f,
+      g; // f is the non-linear function, g is the index for the message word.
 
       // Determine the non-linear function (F, G, H, or I) and the message word index 'g'
       // based on the current round (i).
